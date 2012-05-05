@@ -11,6 +11,7 @@ class Edit extends Backbone.View
 		panel ||= new Edit.Panel()
 		@render()
 		@$el.one('click.edit', @activate)
+		@$el.addClass('editable')
 		
 	activate: ( event = null )=>
 		unless event is null
