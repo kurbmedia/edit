@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<link rel="dns-prefetch" href="//ajax.googleapis.com" />
+	<title></title>	
+	<meta name="description" content="" />
+	<meta name="author" content="" />
+	<link rel="stylesheet" href="assets/normalize.css" type="text/css" />
+	<link rel="stylesheet" href="assets/edit.css" type="text/css" />
+	<link rel="stylesheet" href="assets/demo.css" type="text/css" />
+</head>
+<body>
+	<div id="wrapper">
+		<h1>Backbone-Edit</h1>
+		<div id="editor">
+			<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sagittis metus elit. Nulla tincidunt lorem tristique velit feugiat vehicula. Vestibulum et ipsum non eros imperdiet aliquet. Curabitur eu erat dolor, nec blandit orci. Aenean enim orci, bibendum non commodo in, cursus sed augue. Aenean quis massa quis nisl ultrices interdum. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Pellentesque in odio tortor. Fusce laoreet fermentum rhoncus. Praesent adipiscing auctor turpis, et viverra diam tincidunt nec. Integer sagittis, tortor at molestie molestie, lacus est iaculis tellus, vitae sagittis magna mauris in metus. Nullam magna enim, elementum id consectetur euismod, accumsan ut risus. Suspendisse potenti. Quisque quis turpis metus, a mattis lacus.</p>
+			<p>Integer varius lacus eget lacus lobortis ut mattis purus luctus. Etiam non magna non nunc pellentesque eleifend. Nullam felis augue, dictum sed ultrices gravida, viverra a diam. Aliquam semper, augue eget interdum varius, lacus lacus porttitor mauris, vitae vestibulum dolor risus sit amet arcu. Aliquam blandit luctus tortor, sit amet aliquet metus ornare eget. Aenean non accumsan libero. Ut massa odio, mattis convallis vestibulum et, sagittis vitae nisi. Integer congue iaculis massa, ut lobortis nulla feugiat ac. Aenean rhoncus mauris sed ante feugiat commodo. Ut molestie, est nec consequat ultricies, mi lorem gravida purus, id vestibulum purus neque quis purus. Morbi augue est, convallis vitae porta ut, ullamcorper vestibulum felis. In sit amet mi lectus. Mauris at rhoncus nisl. Fusce vel tincidunt urna.</p>
+		</div>
+	</div>
+	<script src="vendor/jquery-1.7.2.js" type="text/javascript" charset="utf-8"></script>
+	<script src="vendor/underscore-1.3.3.js" type="text/javascript" charset="utf-8"></script>
+	<script src="vendor/backbone-0.9.2.js" type="text/javascript" charset="utf-8"></script>	
+	<script src="vendor/scroll-events.js" type="text/javascript" charset="utf-8"></script>
+	<script src="lib/edit.js" type="text/javascript" charset="utf-8"></script>
+	<script src="lib/commands.js" type="text/javascript" charset="utf-8"></script>
+	<script src="lib/panel.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript" charset="utf-8">
+	//<![CDATA[
+		$(function(){
+			window.editor = new Edit({ el: $('#editor') });
+		});
+		
+	//]]>
+	</script>
+</body>
+</html>

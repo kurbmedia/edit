@@ -1,0 +1,30 @@
+div.editing{ 
+	padding:.5em; 
+	outline:1px dotted #aaa;
+}
+
+.editor-clipped-target{ 
+	clip:rect(1px, 1px, 1px, 1px); 
+	clip:rect(1px 1px 1px 1px);
+	position:absolute;
+}
+
+#editor_panel_instance{
+	position:fixed;
+	padding:.5em;
+	background:#eee;
+}
+
+#editor_panel_instance ul.controls{
+	list-style-type:none;
+	margin:0; 
+	padding:0;
+}
+
+#editor_panel_instance ul.controls > li{
+	display:inline-block;
+}
+
+#editor_panel_instance ul.controls > li > a{
+	display:block;
+}
