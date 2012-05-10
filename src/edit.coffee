@@ -96,7 +96,6 @@ class Edit extends Backbone.View
 		@update()
 		@
 	
-	
 	hide:()-> @$el.hide();
 	show:()-> 
 		@$el.css( top: "-3000em", left: "-9999em" ).show()
@@ -127,14 +126,7 @@ class Edit extends Backbone.View
 	
 	# Save the current dom selection for use later
 	
-	saveSelection:()->
-		@selection = null
-		if window.getSelection
-			internal = window.getSelection()
-			@selection = if internal.rangeCount > 0 then internal.getRangeAt(0) else null
-		else if document.selection && document.selection.createRange
-			@selection = document.selection.createRange()
-		@selection
+	saveSelection:()-> @selection = getSelection()
 	
 	# Select all of the content within an editable instance
 	
@@ -158,6 +150,7 @@ class Edit extends Backbone.View
 	update:(event)=>
 		if event && event.type is 'click'
 			event.stopImmediatePropagation()
+			@_reposition(true) if $(window).scrollTop() > 0
 		@$('.control').removeClass('active')
 			.each(()->
 				cmd = $(this).attr('data-command')
@@ -207,11 +200,13 @@ class Edit extends Backbone.View
 	# Move the instance to line up with the editable node
 	
 	_reposition:(event)=>
-		if event
+		if event && event.preventDefault
 			event.preventDefault()
 		return @ if @instance is null
 		coords = getPosition(@$el, @instance)
-		@$el.css(coords)
+		if (event && event.type is 'scrollstop') or event is true
+			@$el.animate(coords, 500)
+		else @$el.css(coords)
 		return false
 		
 	# Options for an item are passed on each activation, update local copy and 
@@ -229,10 +224,32 @@ class Edit extends Backbone.View
 		@saveSelection()
 
 
+getSelection = ()->
+	selection = null
+	if window.getSelection
+		internal = window.getSelection()
+		selection = if internal.rangeCount > 0 then internal.getRangeAt(0) else null
+	else if document.selection && document.selection.createRange
+		selection = document.selection.createRange()
+	selection
+
+getCursorPosition = ()->
+	range = getSelection()
+	marker = $("<span/>")
+	nrange = document.createRange()
+	nrange.setStart(range.endContainer, range.endOffset)
+	nrange.insertNode(marker.get(0))
+	position = marker.offset()
+	marker.remove()
+	position
+
 getPosition = ( node, target )->
 	npos = node.offset()
 	tpos = target.offset()
-	diff = node.outerHeight(true)
+	diff = node.outerHeight(true) 
+	
+	if $(window).scrollTop() > 0
+		tpos.top = (getCursorPosition().top - $(window).scrollTop()) - 20
 	top: (tpos.top - diff), left: tpos.left
 
 @Edit = window.Edit = Edit

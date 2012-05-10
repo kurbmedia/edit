@@ -6,7 +6,7 @@
 	outline:1px dotted #aaa;
 }
 
-.editor-clipped-target{ 
+.editor-clipped-target, #editor_paste_bin{ 
 	clip:rect(1px, 1px, 1px, 1px); 
 	clip:rect(1px 1px 1px 1px);
 	position:absolute;
