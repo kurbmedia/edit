@@ -1,4 +1,20 @@
 checkState = (cmd)-> document.queryCommandState(cmd, false, true)
+checkNode  = (node)->
+	parent = getParent()
+	return false if parent is null
+	parent.is(node)
+
+getParent = ()->
+	check = null
+	if (document.selection)
+		check = $(document.selection.createRange().parentElement())
+	else
+		selection = window.getSelection()
+		if selection.rangeCount > 0
+			check = $(selection.getRangeAt(0).startContainer.parentNode)
+		else return null
+	check
+			
 Commands   =
 	bold:
 		isActive: ()-> checkState('bold', false, true)
@@ -14,11 +30,12 @@ Commands   =
 		toggle: ()-> document.execCommand('italic', false, true)
 
 	link:
+		isActive: ()-> checkNode('a')
 		exec: ()->
 			Commands.removeFormat()
 			document.execCommand('createLink', false, 
 				window.prompt('URL:', 'http://'))
-
+				
 	ol:
 		isActive: ()-> checkState('insertOrderedList', false, true)
 		exec: ()-> document.execCommand('insertOrderedList', false, true)
@@ -29,9 +46,13 @@ Commands   =
 				document.execCommand('outdent', false, true)
 
 	unlink:
+		isActive: ()-> checkNode('a')
 		exec: ()->
 			Commands.removeFormat()
-			document.execCommand('unlink', false, null)
+			document.execCommand('Unlink', false, null)
+			if checkNode('a') && getParent()
+				link = getParent()
+				link.replaceWith(link.html())
 
 	ul: 
 		isActive: ()-> checkState('insertUnorderedList', false, true)

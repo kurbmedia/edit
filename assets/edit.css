@@ -14,8 +14,31 @@
 
 div.editor-toolbar{
 	position:fixed;
-	padding:5px;
 	margin-bottom:10px;
+}
+
+div.editor-toolbar ul.tab-nav{
+	list-style-type:none;
+	text-align:left;
+	margin:0;
+	padding:0;
+}
+
+div.editor-toolbar ul.tab-nav > li{
+	display:inline-block;
+}
+
+div.editor-toolbar ul.tab-nav > li a{
+	display:block;
+	padding:.25em 1em;
+	font-size:11px;
+	line-height:15px;
+	color:#333;
+	text-decoration:none;
+}
+
+div.editor-toolbar ul.tab-nav > li.active a{
+	border-radius:5px 5px 0 0;
 	background:#eee;
 }
 
@@ -30,5 +53,17 @@ div.editor-toolbar ul.controls > li{
 }
 
 div.editor-toolbar ul.controls > li > a{
+	display:block;
+}
+
+div.editor-toolbar div.tool-panel{
+	min-width:200px;
+	padding:7px;
+	background:#eee;
+	display:none;
+}
+
+div.editor-toolbar div.tool-panel.active{
+	min-height:26px;
 	display:block;
 }

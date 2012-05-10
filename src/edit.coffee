@@ -1,3 +1,5 @@
+instance = null
+
 class Edit extends Backbone.View
 	tagName: 'div'
 	className: 'editor-toolbar'	
@@ -6,13 +8,16 @@ class Edit extends Backbone.View
 		multiline: true
 		markup: true
 		placeholder: ""
-		controls: ['bold', 'italic', 'link']
-	
-	events: 
-		'click a.control' : '_exec'
+		plugins: 
+			format: ['bold', 'italic']
+		assets: false
 		
+	events: 
+		'click ul.tab-nav a': '_swapTabs'
+	
 	selection: null
 	_pastebin: null
+	_tabs: null
 	
 	initialize:-> 
 		@render()
@@ -23,6 +28,7 @@ class Edit extends Backbone.View
 		@on('active', @show)
 		@on('inactive', @hide)
 		$(window).on('scrollstop', @_reposition)
+		instance = @
 		@
 	
 	# Make a dom element editable.
@@ -52,6 +58,8 @@ class Edit extends Backbone.View
 			.on('blur.edit', @_saveState)
 		
 		@instance.addClass('multiline-editable') if @options.multiline
+		
+		@_initPlugins()
 		@trigger('active')
 		@
 	
@@ -109,8 +117,10 @@ class Edit extends Backbone.View
 		content ||= @_pastebin.html()
 		@restoreSelection()
 		@instance.focus()
-		document.execCommand('insertHTML', false, content)
 		@_pastebin.empty()
+		@saveSelection()
+		document.execCommand('insertHTML', false, content)
+		@restoreSelection()
 	
 	# Restore the currently saved selection. Skip if null
 
@@ -153,14 +163,30 @@ class Edit extends Backbone.View
 			@_reposition(true) if $(window).scrollTop() > 0
 		@$('.control').removeClass('active')
 			.each(()->
-				cmd = $(this).attr('data-command')
+				link = $(this)
+				cmd  = link.attr('data-command')
 				if Edit.Commands[cmd] && Edit.Commands[cmd].isActive && Edit.Commands[cmd].isActive()
-					$(this).addClass('active')
+					link.addClass('active')
+					if link.hasClass("disabled")
+						link.removeClass('disabled')
+							.addClass('enabled')
+				else
+					if link.hasClass('enabled')
+						link.addClass('disabled')
+							.removeClass("enabled")
 			)
 	
 	#-----------------------------------------
 	# private
 	#-----------------------------------------
+	
+	# Adds a panel to the toolbar, including tab
+	
+	_addPanel: (name, plugin)->
+		plugin_id    = "editor_plugin_#{name}"
+		@_tabs[name] = plugin
+		@$('ul.tab-nav').append( makeTab( name: name, id: "##{plugin_id}", title: plugin.tabTitle ))
+		@$el.append( plugin.render().el )
 	
 	# Triggers a changed event, on both the editor and the instance
 	
@@ -172,20 +198,35 @@ class Edit extends Backbone.View
 	# Events here are explicitly halted to try and retain focus on the editable node
 	
 	_exec:( event )=>
-		event.preventDefault()
-		event.stopImmediatePropagation()
+		murder(event)
 		link = $(event.currentTarget)
 		unless link.hasClass('disabled')
 			cmd  = link.attr('data-command')
 			@exec(cmd)
 	
+	# Initialize all activated plugins
+	
+	_initPlugins:()->
+		@$el.empty()
+		tablist = $("<ul class='tab-nav'></ul>")
+		@$el.append(tablist)
+		@_tabs  = {}
+		
+		_.each(@options.plugins, ( options, name )=> 
+			if plugin = Edit.Plugin.load(name)
+				@_addPanel( name, new plugin(options) )
+				plugin.editor = @
+		)
+
+		@$('ul.tab-nav li:first, div.tool-panel:first')
+			.addClass("active")
+		
 	# Handle key-down to prevent newlines in nodes which aren't multi-line editable
 	# as well as to prevent "clearing" instances of all content
 	
 	_keydown:(event)=>
 		if !@options.multiline && event.keyCode is 13
-			event.stopPropagation()
-			event.preventDefault()
+			murder(event)
 			return false
 		if event.keyCode is 8 && Edit.Util.isEmpty() && @instance.find('p, li').length is 1
 			event.preventDefault()
@@ -215,14 +256,35 @@ class Edit extends Backbone.View
 	_setOptions:(passed)->
 		unless passed.multiline
 			passed.multiline = !Edit.Util.isInline(@instance.get(0))
-		@options = $.extend({}, @defaults, passed)
+		@options = _.defaults(passed, @defaults)
 		
 	# Saves the current 'state' of an editable on blur. 
 	# This includes the current selection for manipulation later
 	_saveState:(event)=>
 		event.preventDefault()
 		@saveSelection()
+		
+	# Tab between options in the toolbar
+	_swapTabs:(event)=>
+		murder(event)
+		link = $(event.currentTarget)
+		@$('div.tool-panel.active, ul.tab-nav li.active').removeClass("active")
+		link.parent('li').addClass('active')
+		_.each( @_tabs, ( plugin, name )-> plugin.trigger('inactive') )
+		@_tabs[link.attr('data-plugin')].trigger('active')
 
+
+#-----------------------------------------
+# class level funcs
+#-----------------------------------------
+
+_.extend( Edit, _instance: ()-> instance )
+
+#-----------------------------------------
+# util funcs
+#-----------------------------------------
+
+# Get the current document selection
 
 getSelection = ()->
 	selection = null
@@ -233,8 +295,11 @@ getSelection = ()->
 		selection = document.selection.createRange()
 	selection
 
+# Get the window x/y of the cursor
+
 getCursorPosition = ()->
 	range = getSelection()
+	return null if range is null
 	marker = $("<span/>")
 	nrange = document.createRange()
 	nrange.setStart(range.endContainer, range.endOffset)
@@ -243,13 +308,25 @@ getCursorPosition = ()->
 	marker.remove()
 	position
 
+# Calculate the position of an item based on a target item
+
 getPosition = ( node, target )->
 	npos = node.offset()
 	tpos = target.offset()
 	diff = node.outerHeight(true) 
 	
 	if $(window).scrollTop() > 0
-		tpos.top = (getCursorPosition().top - $(window).scrollTop()) - 20
+		cpos = getCursorPosition()
+		unless cpos is null
+			tpos.top = (getCursorPosition().top - $(window).scrollTop()) - 20
 	top: (tpos.top - diff), left: tpos.left
+
+# Kill an event, DEAD
+
+murder = (event)->
+	event.preventDefault()
+	event.stopImmediatePropagation()
+	
+makeTab = (options)=> _.template("<li><a href='<%= id %>' data-plugin='<%= name %>'><%= title %></a></li>")( options )
 
 @Edit = window.Edit = Edit

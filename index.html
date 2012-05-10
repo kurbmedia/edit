@@ -13,17 +13,15 @@
 <body>
 	<div id="wrapper">
 		<h1>Backbone-Edit</h1>
-		<h2>This is an editable single-line heading</h2>
-		<div id="editor">
-			<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sagittis metus elit. Nulla tincidunt lorem tristique velit feugiat vehicula. Vestibulum et ipsum non eros imperdiet aliquet. Curabitur eu erat dolor, nec blandit orci. Aenean enim orci, bibendum non commodo in, cursus sed augue. Aenean quis massa quis nisl ultrices interdum. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Pellentesque in odio tortor. Fusce laoreet fermentum rhoncus. Praesent adipiscing auctor turpis, et viverra diam tincidunt nec. Integer sagittis, tortor at molestie molestie, lacus est iaculis tellus, vitae sagittis magna mauris in metus. Nullam magna enim, elementum id consectetur euismod, accumsan ut risus. Suspendisse potenti. Quisque quis turpis metus, a mattis lacus.</p>
-			<p>Integer varius lacus eget lacus lobortis ut mattis purus luctus. Etiam non magna non nunc pellentesque eleifend. Nullam felis augue, dictum sed ultrices gravida, viverra a diam. Aliquam semper, augue eget interdum varius, lacus lacus porttitor mauris, vitae vestibulum dolor risus sit amet arcu. Aliquam blandit luctus tortor, sit amet aliquet metus ornare eget. Aenean non accumsan libero. Ut massa odio, mattis convallis vestibulum et, sagittis vitae nisi. Integer congue iaculis massa, ut lobortis nulla feugiat ac. Aenean rhoncus mauris sed ante feugiat commodo. Ut molestie, est nec consequat ultricies, mi lorem gravida purus, id vestibulum purus neque quis purus. Morbi augue est, convallis vitae porta ut, ullamcorper vestibulum felis. In sit amet mi lectus. Mauris at rhoncus nisl. Fusce vel tincidunt urna.</p>
+		<div vocab="http://schema.org" typeof="Article">
+			<h2 property="headline">This is an editable single-line heading</h2>
+			<div property="artcleBody" id="editor">
+				<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sagittis metus elit. Nulla tincidunt lorem tristique velit feugiat vehicula. Vestibulum et ipsum non eros imperdiet aliquet. Curabitur eu erat dolor, nec blandit orci. Aenean enim orci, bibendum non commodo in, cursus sed augue. Aenean quis massa quis nisl ultrices interdum. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Pellentesque in odio tortor. Fusce laoreet fermentum rhoncus. Praesent adipiscing auctor turpis, et viverra diam tincidunt nec. Integer sagittis, tortor at molestie molestie, lacus est iaculis tellus, vitae sagittis magna mauris in metus. Nullam magna enim, elementum id consectetur euismod, accumsan ut risus. Suspendisse potenti. Quisque quis turpis metus, a mattis lacus.</p>
+				<p>Integer varius lacus eget lacus lobortis ut mattis purus luctus. Etiam non magna non nunc pellentesque eleifend. Nullam felis augue, dictum sed ultrices gravida, viverra a diam. Aliquam semper, augue eget interdum varius, lacus lacus porttitor mauris, vitae vestibulum dolor risus sit amet arcu. Aliquam blandit luctus tortor, sit amet aliquet metus ornare eget. Aenean non accumsan libero. Ut massa odio, mattis convallis vestibulum et, sagittis vitae nisi. Integer congue iaculis massa, ut lobortis nulla feugiat ac. Aenean rhoncus mauris sed ante feugiat commodo. Ut molestie, est nec consequat ultricies, mi lorem gravida purus, id vestibulum purus neque quis purus. Morbi augue est, convallis vitae porta ut, ullamcorper vestibulum felis. In sit amet mi lectus. Mauris at rhoncus nisl. Fusce vel tincidunt urna.</p>
+			</div>
+			<meta property="creator" content="Brent Kirby" />
 		</div>
 		<div id="editor_toolbar" class="editor-toolbar">
-			<ul class="controls">
-				<li><a href='#' class="control bold" data-command="bold">Bold</a></li>
-				<li><a href='#' class="control italic" data-command="italic">Italic</a></li>
-				<li><a href='#' class="control link" data-command="link">Link</a></li>
-			</ul>
 		</div>
 	</div>
 	<script src="vendor/jquery-1.7.2.js" type="text/javascript" charset="utf-8"></script>
@@ -33,16 +31,37 @@
 	<script src="lib/edit.js" type="text/javascript" charset="utf-8"></script>
 	<script src="lib/utils.js" type="text/javascript" charset="utf-8"></script>
 	<script src="lib/commands.js" type="text/javascript" charset="utf-8"></script>
+	<script src="lib/data.js" type="text/javascript" charset="utf-8"></script>
+	<script src="lib/plugin.js" type="text/javascript" charset="utf-8"></script>
+	<script src="lib/plugins/format.js" type="text/javascript" charset="utf-8"></script>
+	<script src="lib/plugins/assets.js" type="text/javascript" charset="utf-8"></script>
 	<script type="text/javascript" charset="utf-8">
 	//<![CDATA[
 		$(function(){
-			var editor = window.editor = new Edit({ el: $('#editor_toolbar') });
+			var editor = window.editor = new Edit({ el: $('#editor_toolbar') }),
+				opts, bodyopts;
+				
 			editor.render();
+			opts = {
+				multiline:false,
+				plugins: {
+					format: { controls: ['bold', 'italic'] }
+				}
+			};
+			
+			bodyopts = {
+				plugins: {
+					format: { controls: ['bold', 'italic', 'link', 'unlink'] },
+					assets: { url: '/spec/assets' }
+				}
+			};
 			
 			$('#editor, h2').on('click', function(event){
-				if( $(this).hasClass('editing') ) return true;
+				var node = $(this)
+				if( node.hasClass('editing') ) return true;
 				event.stopImmediatePropagation();
-				editor.activate($(this));
+				if( node.is('h2') ) editor.activate(node, opts);
+				else editor.activate(node, bodyopts);
 			});
 			
 			$('html').on('click', function(event){
