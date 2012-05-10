@@ -1,46 +1,41 @@
+
 describe("the Edit class", function() {
-  
-	it("is a class", function() {
-		expect(Edit).toBeDefined();
-	});
-
-	it("extends Backbone.View", function() {
-		expect(Edit.prototype.render).toBeDefined();
-	});
-
+  it("is a class", function() {
+    return expect(Edit).toBeDefined();
+  });
+  return it("extends Backbone.View", function() {
+    return expect(Edit.prototype.render).toBeDefined();
+  });
 });
 
-describe("An editor", function() {
-  
-	var editor, node, panel;
-	
-	beforeEach(function(){
-		editor = helper.edit();
-		node   = helper.node();
-		panel  = $('#editor_panel_instance');
-	}); 
-
-	it("adds the class editable to its element", function() {
-		expect(node.hasClass('editable'))
-			.toBeTruthy();
+describe("An editor instance", function() {
+  var editor, node;
+  editor = node = null;
+  beforeEach(function() {
+    editor = helper.edit();
+    return node = helper.node();
   });
-
-	describe('on element click', function(){
-		
-		beforeEach(function(){
-			node.click();
-		});
-		
-		it("activates the editor for that element", function(){
-			expect(node.attr('contenteditable'))
-				.toEqual('true');
-		});
-		
-		it("displays the panel for modifying styles", function(){
-			expect(panel.is(':hidden'))
-				.toBeFalsy();
-		});
-
-	});
-
+  describe('on activating a node', function() {
+    beforeEach(function() {
+      return editor.activate(node);
+    });
+    it("activates the editor for that element", function() {
+      return expect(node).toHaveAttr('contenteditable');
+    });
+    return it("adds the class editable to its element", function() {
+      return expect(node).toHaveClass('editing');
+    });
+  });
+  return describe('on de-activating a node', function() {
+    beforeEach(function() {
+      editor.activate(node);
+      return editor.deactivate(node);
+    });
+    it("deactivates editing for that instance", function() {
+      return expect(node).toNotHaveAttr('contenteditable');
+    });
+    return it("adds the class editable to its element", function() {
+      return expect(node).toNotHaveClass('editing');
+    });
+  });
 });

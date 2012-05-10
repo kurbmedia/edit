@@ -1,5 +1,8 @@
-div.editing{ 
-	padding:.5em; 
+.editing[contenteditable].multiline-editable{ 
+	padding:.5em; 	
+}
+
+.editing[contenteditable]{
 	outline:1px dotted #aaa;
 }
 
@@ -9,22 +12,23 @@ div.editing{
 	position:absolute;
 }
 
-#editor_panel_instance{
+div.editor-toolbar{
 	position:fixed;
-	padding:.5em;
+	padding:5px;
+	margin-bottom:10px;
 	background:#eee;
 }
 
-#editor_panel_instance ul.controls{
+div.editor-toolbar ul.controls{
 	list-style-type:none;
 	margin:0; 
 	padding:0;
 }
 
-#editor_panel_instance ul.controls > li{
+div.editor-toolbar ul.controls > li{
 	display:inline-block;
 }
 
-#editor_panel_instance ul.controls > li > a{
+div.editor-toolbar ul.controls > li > a{
 	display:block;
 }

@@ -15,14 +15,21 @@ p{
 	margin-top:0; 
 }
 
-#editor{
-	padding:5px;
+
+div.editor-toolbar ul.controls > li > a.bold{ background:white url('icons/bold.png') center no-repeat; }
+div.editor-toolbar ul.controls > li > a.italic{ background:white url('icons/italic.png') center no-repeat; }
+div.editor-toolbar ul.controls > li > a.link{ background:white url('icons/link.png') center no-repeat; }
+div.editor-toolbar ul.controls > li > a.unlink{ background:white url('icons/unlink.png') center no-repeat; }
+div.editor-toolbar ul.controls > li > a.image{ background:white url('icons/image.png') center no-repeat; }
+div.editor-toolbar ul.controls > li > a{
+	display:block; 
+	height:24px; 
+	width:24px; 
+	border:1px solid #ccc; 
+	text-indent:-9999em;
+	opacity:0.7;
 }
 
-#editor:not(.editing):hover{ 
-	outline:1px solid #eee; 
-}
-#editor_panel_instance ul.controls > li > a{
-	display:block;
-	font-size:14px;
+div.editor-toolbar ul.controls > li > a.active{
+	opacity:1;
 }
