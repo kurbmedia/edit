@@ -14,6 +14,12 @@ Utils =
 		else
 		 $.isEmptyObject( value )
 	
+	# Completely kill an event
+	
+	murder: (event)->
+		event.preventDefault()
+		event.stopImmediatePropagation()
+	
 	# Replace a html node with a different one
 	replace: ( node, current, replacer )->
 		if _.isArray( current )

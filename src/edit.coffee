@@ -10,14 +10,13 @@ class Edit extends Backbone.View
 		placeholder: ""
 		plugins: 
 			format: ['bold', 'italic']
-		assets: false
-		
-	events: 
-		'click ul.tab-nav a': '_swapTabs'
+		fixed: true
 	
+	fixed: true
 	selection: null
 	_pastebin: null
 	_tabs: null
+	_content: null
 	
 	initialize:-> 
 		@render()
@@ -27,9 +26,18 @@ class Edit extends Backbone.View
 		@_pastebin = $('#editor_paste_bin')
 		@on('active', @show)
 		@on('inactive', @hide)
-		$(window).on('scrollstop', @_reposition)
-		instance = @
+		
+		if @options.fixed
+			$(window).on('scrollstop', @_reposition)
+			
+		@$el.addClass("editor-component")
+		@$el.append($("<div id='editor_toolbar_content'></div>"))
+		@_content = $('#editor_toolbar_content')
+		instance  = Edit.instance = @
 		@
+	
+	# Append content to the toolbar
+	append:( content )-> @_content.append(content)
 	
 	# Make a dom element editable.
 	
@@ -47,7 +55,7 @@ class Edit extends Backbone.View
 		# and bind any necessary events
 		
 		@instance = $(node)
-		@_setOptions(options)
+		@options  = @_setOptions(options)
 
 		@instance.attr('contenteditable', true)
 			.addClass('editing')
@@ -90,6 +98,7 @@ class Edit extends Backbone.View
 			@instance.off('.edit')
 				.removeAttr('contenteditable')
 				.removeClass('editing multiline-editable')
+			@_content.tabs("destroy")
 
 	# Execute a command on the current instance
 	
@@ -186,7 +195,9 @@ class Edit extends Backbone.View
 		plugin_id    = "editor_plugin_#{name}"
 		@_tabs[name] = plugin
 		@$('ul.tab-nav').append( makeTab( name: name, id: "##{plugin_id}", title: plugin.tabTitle ))
-		@$el.append( plugin.render().el )
+		@append( plugin.render().el )
+		plugin.$el.attr('id', plugin_id)
+			.addClass('ui-helper-clearfix')
 	
 	# Triggers a changed event, on both the editor and the instance
 	
@@ -207,9 +218,9 @@ class Edit extends Backbone.View
 	# Initialize all activated plugins
 	
 	_initPlugins:()->
-		@$el.empty()
+		@_content.empty()
 		tablist = $("<ul class='tab-nav'></ul>")
-		@$el.append(tablist)
+		@append(tablist)
 		@_tabs  = {}
 		
 		_.each(@options.plugins, ( options, name )=> 
@@ -217,9 +228,8 @@ class Edit extends Backbone.View
 				@_addPanel( name, new plugin(options) )
 				plugin.editor = @
 		)
-
-		@$('ul.tab-nav li:first, div.tool-panel:first')
-			.addClass("active")
+		
+		@_content.tabs()
 		
 	# Handle key-down to prevent newlines in nodes which aren't multi-line editable
 	# as well as to prevent "clearing" instances of all content
@@ -241,6 +251,7 @@ class Edit extends Backbone.View
 	# Move the instance to line up with the editable node
 	
 	_reposition:(event)=>
+		return true unless @options.fixed
 		if event && event.preventDefault
 			event.preventDefault()
 		return @ if @instance is null
@@ -256,22 +267,13 @@ class Edit extends Backbone.View
 	_setOptions:(passed)->
 		unless passed.multiline
 			passed.multiline = !Edit.Util.isInline(@instance.get(0))
-		@options = _.defaults(passed, @defaults)
+		_.defaults(passed, @defaults)
 		
 	# Saves the current 'state' of an editable on blur. 
 	# This includes the current selection for manipulation later
 	_saveState:(event)=>
 		event.preventDefault()
 		@saveSelection()
-		
-	# Tab between options in the toolbar
-	_swapTabs:(event)=>
-		murder(event)
-		link = $(event.currentTarget)
-		@$('div.tool-panel.active, ul.tab-nav li.active').removeClass("active")
-		link.parent('li').addClass('active')
-		_.each( @_tabs, ( plugin, name )-> plugin.trigger('inactive') )
-		@_tabs[link.attr('data-plugin')].trigger('active')
 
 
 #-----------------------------------------

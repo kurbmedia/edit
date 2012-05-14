@@ -33,3 +33,37 @@ div.editor-toolbar ul.controls > li > a{
 div.editor-toolbar ul.controls > li > a.active{
 	opacity:1;
 }
+
+#editor_plugin_assets > div{ 
+	padding:7px;
+	float:left; 
+}
+
+#editor_plugin_assets > div h4{
+	font-size:11px;
+	text-transform:uppercase;
+	margin:0 0 .5em 0;
+}
+
+#edit_asset_tree{
+	width:400px;
+	margin-right:10px;
+	background:#efefef;
+	border:1px solid #ececec;
+}
+
+#edit_asset_tree ul{
+	font-size:12px;
+	padding:0 0 0 1.5em;
+	margin:0 0 1.5em 0;
+}
+
+#edit_asset_tree ul li{
+	float:left;
+	width:33%;
+	margin-bottom:.25em;
+}
+
+#edit_asset_upload{
+	width:200px;
+}

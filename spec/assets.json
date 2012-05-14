@@ -33,17 +33,17 @@
 		"name": "Image 2",
 		"source": "/assets/spec/image2.jpg",
 		"type": "image"
-	}
+	},
 	{
 		"name": "Image 3",
 		"source": "/assets/spec/image3.jpg",
 		"type": "image"
-	}
+	},
 	{
 		"name": "Image 4",
 		"source": "/assets/spec/image4.jpg",
 		"type": "image"
-	}
+	},
 	{
 		"name": "Image 5",
 		"source": "/assets/spec/image5.jpg",
